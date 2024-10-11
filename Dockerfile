@@ -9,6 +9,7 @@ ARG port=80
 #Container working directory
 WORKDIR /usr/local/apache2/htdocs/
 COPY inance .
+RUN ls -l
 RUN cp -R inance/* .
 #Preparing the folder++
  
