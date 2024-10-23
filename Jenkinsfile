@@ -21,14 +21,16 @@ pipeline {
         stage("Code scan") {
             steps {
                 script {
-                    withSonarQubeEnv('sonar') {
-                        sh '''
-                        $scanner/bin/sonar-scanner \
-                        -Dsonar.login=sonar \
-                        -Dsonar.host.url=http://18.219.90.216:9000/ \
-                        -Dsonar.projectKey=inance \
-                        -Dsonar.sources=./inance
-                        '''
+                    withCredentials([string(credentialsId: 'sonar', variable: 'SONAR_TOKEN')]) {
+                        withSonarQubeEnv('sonar') {
+                            sh '''
+                            $scanner/bin/sonar-scanner \
+                            -Dsonar.login=$SONAR_TOKEN \
+                            -Dsonar.host.url=http://18.219.90.216:9000/ \
+                            -Dsonar.projectKey=inance \
+                            -Dsonar.sources=./inance
+                            '''
+                        }
                     }
                 }
             }
