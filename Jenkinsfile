@@ -3,10 +3,8 @@ pipeline {
 
     parameters {
         string(name: 'github-url', defaultValue: '', description: 'Enter your GitHub URL')
-        string(name: 'branch-name', defaultValue: 'main', description: 'Enter the branch name to clone')
         string(name: 'image-name', defaultValue: 'dockerhubusername/repo-name', description: 'Enter your image name')
         string(name: 'image-tag', defaultValue: '', description: 'Enter your image tag')
-        string(name: 'source-dir', defaultValue: './inance', description: 'Enter the source directory for SonarQube scan')
         booleanParam(name: 'skip-stage', defaultValue: false, description: "Mark for yes or leave empty for false")
     }
 
@@ -17,20 +15,20 @@ pipeline {
     stages {
         stage("Clone repository") {
             steps {
-                git branch: "${params['branch-name']}", url: "${params['github-url']}", credentialsId: "github-dylan"
+                git branch: 'main', url: "${params['github-url']}", credentialsId: "github-dylan"
             }
         }
         stage("Code scan") {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'sonar', variable: 'SONAR_TOKEN')]) {
+                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
                         withSonarQubeEnv('sonar') {
                             sh '''
                             $scanner/bin/sonar-scanner \
                             -Dsonar.login=$SONAR_TOKEN \
                             -Dsonar.host.url=http://18.219.90.216:9000/ \
                             -Dsonar.projectKey=inance \
-                            -Dsonar.sources=${params['source-dir']}
+                            -Dsonar.sources=./inance
                             '''
                         }
                     }
@@ -39,7 +37,7 @@ pipeline {
         }
         stage("Build Dockerfile") {
             when {
-                expression { !params.skip-stage }
+                expression { !params.skip-stage } // Only execute if 'skip-stage' is false
             }
             steps {
                 script {
@@ -49,7 +47,7 @@ pipeline {
         }
         stage("Connect to DockerHub") {
             when {
-                expression { !params.skip-stage }
+                expression { !params.skip-stage } // Only execute if 'skip-stage' is false
             }
             steps {
                 script {
@@ -62,7 +60,7 @@ pipeline {
         }
         stage("Push to DockerHub") {
             when {
-                expression { !params.skip-stage }
+                expression { !params.skip-stage } // Only execute if 'skip-stage' is false
             }
             steps {
                 script {
