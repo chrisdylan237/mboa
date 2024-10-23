@@ -47,7 +47,7 @@ pipeline {
         }
         stage("Connect to DockerHub") {
             when {
-                expression { !params.skip } // Only execute if 'skip' is false
+                expression { params.skip } // Only execute if 'skip' is false
             }
             steps {
                 script {
@@ -60,7 +60,7 @@ pipeline {
         }
         stage("Push to DockerHub") {
             when {
-                expression { !params.skip } // Only execute if 'skip' is false
+                expression { params.skip } // Only execute if 'skip' is false
             }
             steps {
                 script {
