@@ -37,7 +37,7 @@ pipeline {
         }
         stage("Build Dockerfile") {
             when {
-                expression { params.skip-stage } // Only execute if 'skip-stage' is false
+                expression { !params.skip-stage } // Only execute if 'skip-stage' is false
             }
             steps {
                 script {
@@ -47,7 +47,7 @@ pipeline {
         }
         stage("Connect to DockerHub") {
             when {
-                expression { params.skip-stage } // Only execute if 'skip-stage' is false
+                expression { !params.skip-stage } // Only execute if 'skip-stage' is false
             }
             steps {
                 script {
@@ -60,7 +60,7 @@ pipeline {
         }
         stage("Push to DockerHub") {
             when {
-                expression { params.skip-stage } // Only execute if 'skip-stage' is false
+                expression { !params.skip-stage } // Only execute if 'skip-stage' is false
             }
             steps {
                 script {
