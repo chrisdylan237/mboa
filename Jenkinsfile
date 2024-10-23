@@ -5,7 +5,7 @@ pipeline {
         string(name: 'github-url', defaultValue: '', description: 'Enter your GitHub URL')
         string(name: 'image-name', defaultValue: 'dockerhubusername/repo-name', description: 'Enter your image name')
         string(name: 'image-tag', defaultValue: '', description: 'Enter your image tag')
-        booleanParam(name: 'skip-stage', defaultValue: false, description: "Mark for yes or leave empty for false")
+        booleanParam(name: 'skip', defaultValue: false, description: "Mark for yes or leave empty for false")
     }
 
     environment {
@@ -37,7 +37,7 @@ pipeline {
         }
         stage("Build Dockerfile") {
             when {
-                expression { !params.skip-stage } // Only execute if 'skip-stage' is false
+                expression { !params.skip } // Only execute if 'skip' is false
             }
             steps {
                 script {
@@ -47,7 +47,7 @@ pipeline {
         }
         stage("Connect to DockerHub") {
             when {
-                expression { !params.skip-stage } // Only execute if 'skip-stage' is false
+                expression { !params.skip } // Only execute if 'skip' is false
             }
             steps {
                 script {
@@ -60,7 +60,7 @@ pipeline {
         }
         stage("Push to DockerHub") {
             when {
-                expression { !params.skip-stage } // Only execute if 'skip-stage' is false
+                expression { !params.skip } // Only execute if 'skip' is false
             }
             steps {
                 script {
