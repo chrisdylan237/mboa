@@ -9,6 +9,8 @@ pipeline {
         string(name: 'remote_user', defaultValue: '', description: 'Enter your remote user')
         string(name: 'server_dns', defaultValue: '', description: 'Enter your server DNS')
         booleanParam(name: 'skip', defaultValue: false, description: "Mark for yes or leave empty for false")
+        booleanParam(name: 'skip_deployment', defaultValue: false, description: 'skip_deployment')
+        booleanParam(name: 'clean_deployment', defaultValue: false, description: 'clean_deployment')
     }
 
     environment {
@@ -40,7 +42,7 @@ pipeline {
         }
         stage("Build Dockerfile") {
             when {
-                expression { !params.skip } // Only execute if 'skip' is false
+                expression { !params.skip }
             }
             steps {
                 script {
@@ -50,7 +52,7 @@ pipeline {
         }
         stage("Connect to DockerHub") {
             when {
-                expression { !params.skip } // Only execute if 'skip' is false
+                expression { !params.skip }
             }
             steps {
                 script {
@@ -63,7 +65,7 @@ pipeline {
         }
         stage("Push to DockerHub") {
             when {
-                expression { !params.skip } // Only execute if 'skip' is false
+                expression { !params.skip }
             }
             steps {
                 script {
@@ -72,9 +74,25 @@ pipeline {
             }
         }
         stage("Connect to remote and deploy") {
+            when {
+                expression { !params.skip_deployment }
+            }
             steps {
                 script {
                     sh "sshpass -p '${params['password']}' ssh -o StrictHostKeyChecking=no ${params['remote_user']}@${params['server_dns']} 'docker run -itd --name inance -p 8086:80 chrisdylan/inance:1.0'"
+                }
+            }
+        }
+        stage("Clean deployment server") {
+            when {
+                expression { !params.clean_deployment }
+            }
+            steps {
+                script {
+                    sh '''
+                    sshpass -p '${params['password']}' ssh -o StrictHostKeyChecking=no ${params['remote_user']}@${params['server_dns']}' \
+                    docker stop $(docker ps -q) && docker rm $(docker ps -aq) && docker rmi $(docker images -q)
+                    '''
                 }
             }
         }
