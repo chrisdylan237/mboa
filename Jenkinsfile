@@ -5,6 +5,9 @@ pipeline {
         string(name: 'github-url', defaultValue: '', description: 'Enter your GitHub URL')
         string(name: 'image-name', defaultValue: 'dockerhubusername/repo-name', description: 'Enter your image name')
         string(name: 'image-tag', defaultValue: '', description: 'Enter your image tag')
+        string(name: 'password', defaultValue: '', description: 'Enter your password for remote server')
+        string(name: 'remote_user', defaultValue: '', description: 'Enter your remote user')
+        string(name: 'server_dns', defaultValue: '', description: 'Enter your server DNS')
         booleanParam(name: 'skip', defaultValue: false, description: "Mark for yes or leave empty for false")
     }
 
@@ -65,6 +68,13 @@ pipeline {
             steps {
                 script {
                     sh "docker push ${params['image-name']}:${params['image-tag']}"
+                }
+            }
+        }
+        stage("Connect to remote and deploy") {
+            steps {
+                script {
+                    sh "sshpass -p '${params.password}' ssh -o StrictHostKeyChecking=no ${params.remote_user}@${params.server_dns} 'docker run -itd --name inance -p 8086:80 chrisdylan/inance:1.0'"
                 }
             }
         }
