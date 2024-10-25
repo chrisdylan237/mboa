@@ -74,7 +74,7 @@ pipeline {
         stage("Connect to remote and deploy") {
             steps {
                 script {
-                    sh "sshpass -p '${params.password}' ssh -o StrictHostKeyChecking=no ${params.remote_user}@${params.server_dns} 'docker run -itd --name inance -p 8086:80 chrisdylan/inance:1.0'"
+                    sh "sshpass -p '${params['password']}' ssh -o StrictHostKeyChecking=no ${params['remote_user']}@${params['server_dns']} 'docker run -itd --name inance -p 8086:80 chrisdylan/inance:1.0'"
                 }
             }
         }
