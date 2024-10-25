@@ -24,6 +24,9 @@ pipeline {
             }
         }
         stage("Code scan") {
+            when {
+                expression { !params.skip }
+            }
             steps {
                 script {
                     withCredentials([string(credentialsId: 'sonar', variable: 'SONAR_TOKEN')]) {
