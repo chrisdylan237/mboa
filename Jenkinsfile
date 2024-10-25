@@ -92,10 +92,10 @@ pipeline {
             }
             steps {
                 script {
-                    sh '''
-                    sshpass -p '${params['password']}' ssh -o StrictHostKeyChecking=no ${params['remote_user']}@${params['server_dns']}' \
-                    docker stop $(docker ps -q) && docker rm $(docker ps -aq) && docker rmi $(docker images -q)
-                    '''
+    
+                    sh "sshpass -p '${params['password']}' ssh -o StrictHostKeyChecking=no ${params['remote_user']}@${params['server_dns']}"
+                    sh "docker stop $(docker ps -q) && docker rm $(docker ps -aq) && docker rmi $(docker images -q)"
+                    
                 }
             }
         }
